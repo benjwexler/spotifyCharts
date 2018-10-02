@@ -35,7 +35,7 @@ class ScraperController < ApplicationController
             
             
             names = link.content
-            if i<172 
+            if i<50 
                 i +=1
                 tracks = RSpotify::Track.search(names, limit: 1)
                 track_id = tracks[0].id
