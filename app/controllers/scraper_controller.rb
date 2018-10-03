@@ -10,7 +10,7 @@ class ScraperController < ApplicationController
    
 
     def index
-        doc = HTTParty.get('https://spotifycharts.com/regional/co/daily/latest')
+        doc = HTTParty.get('https://spotifycharts.com/regional/us/daily/latest')
         @parse_page = Nokogiri::HTML(doc)
 
         country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
@@ -44,7 +44,7 @@ class ScraperController < ApplicationController
                 audio_features = RSpotify::AudioFeatures.find(track_id)
                 song_tempo = audio_features.tempo
                 tempoArr.push(song_tempo)
-                # puts names
+                puts names
                 tempo_sum += audio_features.tempo
             end 
         end
