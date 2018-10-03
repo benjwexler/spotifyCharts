@@ -10,15 +10,22 @@ class ScraperController < ApplicationController
    
 
     def index
-        doc = HTTParty.get('https://spotifycharts.com/regional/us/daily/latest')
-        @parse_page = Nokogiri::HTML(doc)
 
         country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
+
+        
+       
+
+        doc = HTTParty.get('https://spotifycharts.com/regional/mx/daily/latest')
+        @parse_page = Nokogiri::HTML(doc)
+
+       
 
     
 
         tempoArr = []
         tempo_sum = 0
+        danceability_sum = 0
         i=1
 
         # puts @parse_page
@@ -37,15 +44,18 @@ class ScraperController < ApplicationController
             
             
             names = link.content
-            if i<=50 
+            if i<=10 
                 i +=1
                 tracks = RSpotify::Track.search(names, limit: 1)
                 track_id = tracks[0].id
                 audio_features = RSpotify::AudioFeatures.find(track_id)
                 song_tempo = audio_features.tempo
+                danceability_sum += audio_features.danceability
                 tempoArr.push(song_tempo)
+                puts i
                 puts names
                 tempo_sum += audio_features.tempo
+
             end 
         end
         
@@ -54,6 +64,7 @@ class ScraperController < ApplicationController
   
         puts tempoArr.length
         puts avg_tempo = tempo_sum/i
+        puts avg_dance = danceability_sum/i
 
 
 
