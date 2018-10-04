@@ -3,5 +3,7 @@ Rails.application.routes.draw do
   root 'scraper#index'
 
   get 'index', to: 'scraper#index'
+  get 'bugs', to: 'scraper#bugs'
+  
 
 end
