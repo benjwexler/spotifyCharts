@@ -20,59 +20,51 @@ class ScraperController < ApplicationController
         doc = HTTParty.get("https://spotifycharts.com/regional/#{country}/weekly/latest")
         @parse_page = Nokogiri::HTML(doc)
 
-       
-
-    
-
         tempoArr = []
         tempo_sum = 0
         danceability_sum = 0
         i=1
 
-        # puts @parse_page
 
         puts "### Search for nodes by css"
         puts country 
 
-        # vaina_loca = @parse_page.css('.chart-table-track strong')[1].content
-        # tracks = RSpotify::Track.search(vaina_loca, limit: 1)
-        # track_id = tracks[0].id
-        # audio_features = RSpotify::AudioFeatures.find(track_id)
-        
-        # puts vaina_loca
-        # puts audio_features.tempo
 
         @parse_page.css('.chart-table-track strong').each do |link|
-            
-            
-            names = link.content
+            song_name = link.content
             if i<=50
-                
-                tracks = RSpotify::Track.search(names, limit: 1)
+                tracks = RSpotify::Track.search(song_name, limit: 1)
                 puts i
-                puts names
+                puts song_name
                 if tracks.length >0
-                    track_id = tracks[0].id
-                    audio_features = RSpotify::AudioFeatures.find(track_id)
-                    song_tempo = audio_features.tempo
-                    danceability_sum += audio_features.danceability
-                    tempoArr.push(song_tempo)
-                    
-                    puts track_id
-                    tempo_sum += audio_features.tempo 
+                    name = tracks[0].name
+                    spotify_id = tracks[0].id
+                    audio_features = RSpotify::AudioFeatures.find(spotify_id)
+                    acousticness = audio_features.acousticness
+                    danceability = audio_features.danceability
+                    duration_ms = audio_features.duration_ms
+                    energy = audio_features.energy 
+                    instrumentalness = audio_features.instrumentalness
+                    key = audio_features.key
+                    liveness = audio_features.liveness
+                    mode = audio_features.mode
+                    speechiness = audio_features.speechiness
+                    tempo = audio_features.tempo
+                    time_signature = audio_features.time_signature
+                    valence = audio_features.valence
+
+                    puts spotify_id
+
+                    # Song.create(:name => name, :artist => "unknown", :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)  
                 end 
-                    i +=1
-                
-                
+                    i +=1  
             end 
         end
         
         puts "Blahssdsd"
         puts i
   
-        puts tempoArr.length
-        puts avg_tempo = tempo_sum/i
-        puts avg_dance = danceability_sum/i
+     
 
     end 
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_04_200203) do
+ActiveRecord::Schema.define(version: 2018_10_05_152945) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 2018_10_04_200203) do
   create_table "songs", force: :cascade do |t|
     t.string "name"
     t.string "artist"
-    t.float "spotify_id"
+    t.string "spotify_id"
     t.float "acousticness"
     t.float "danceability"
     t.integer "duration_ms"
