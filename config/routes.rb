@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   get 'index', to: 'scraper#index'
   get 'bugs', to: 'scraper#bugs'
+  get 'countries', to: 'scraper#countries'
   
 
 end
