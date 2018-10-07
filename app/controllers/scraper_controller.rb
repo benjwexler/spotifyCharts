@@ -2,7 +2,6 @@ class ScraperController < ApplicationController
 
     include HTTParty
     include Nokogiri
-    # require 'Nokogiri'
 
     require 'rspotify'
     RSpotify.authenticate(ENV["client_id"], ENV["client_secret"])
@@ -10,9 +9,10 @@ class ScraperController < ApplicationController
    
 
     def index
-
+        j=0
+           
           country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
-
+          if j==2
         #    country_codes = ['us']
         country_codes.each do |country_code|
 
@@ -28,10 +28,11 @@ class ScraperController < ApplicationController
      
         
         end 
+        end 
 
         puts "hi"
         # country_codes = ['us']
-        j=1
+        
         if j == 0 
         country_codes.each do |country|
        
@@ -88,13 +89,14 @@ class ScraperController < ApplicationController
 
     # i =1
 
-    j = 0 
+    j = 1
 
     artist_song_hash.each_value {|value|
                 tracks = RSpotify::Track.search("#{value[0]} #{value[1]} ", limit: 1)
                 # puts i
               
                 if tracks.length >0
+                    
                     name = tracks[0].name
                     spotify_id = tracks[0].id
                     audio_features = RSpotify::AudioFeatures.find(spotify_id)
@@ -112,12 +114,13 @@ class ScraperController < ApplicationController
                     valence = audio_features.valence
  
                     puts spotify_id
-
+                    Chart.create(:country_code => country, :position => j, :spotify_id => spotify_id)
                     Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
                 
                 else 
-                    j = "????? #{value[0]} #{value[1]} ???? "
+                    puts "????? #{value[0]} #{value[1]} ???? "
                 end 
+                j+=1 
                     
             }
         end 
@@ -138,30 +141,6 @@ class ScraperController < ApplicationController
         # puts tracks.length
 
         puts "{ednke}"
-    end 
-
-    def countries
-
-        # country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
-
-       @blah = "yo"
-       puts "### Search for nodes by css"
-       puts "### Search for nodes by css"
-       puts "### Search for nodes by css"
-
-        # country_codes = ['us']
-        # country_codes.each do |country|
-
-        # doc = HTTParty.get("https://spotifycharts.com/regional/#{country}/weekly/latest")
-        # @parse_page = Nokogiri::HTML(doc)
-
-        # country_name  = @parse_page.css('.chart-filters-list .responsive-select .responsive-select-value')
-
-        # puts country_name
-     
-        
-        # end 
-    
     end 
 
 
