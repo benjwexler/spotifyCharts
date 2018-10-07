@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  country_code: MyString
+  position: 1
+  spotify_id: MyString
+
+two:
+  country_code: MyString
+  position: 1
+  spotify_id: MyString
