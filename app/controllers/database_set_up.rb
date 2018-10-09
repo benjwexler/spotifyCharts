@@ -1,4 +1,4 @@
-class ScraperController < ApplicationController
+class databaseController < ApplicationController
 
     include HTTParty
     include Nokogiri
@@ -8,7 +8,6 @@ class ScraperController < ApplicationController
 
    
 
-    def index
         j=0
            
           country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
@@ -21,8 +20,8 @@ class ScraperController < ApplicationController
 
         country_name  = @parse_page.css('.chart-filters-list .responsive-select .responsive-select-value')
 
-        country_name = country_name[0].content
-        # puts country_code
+        puts country_name = country_name[0].content
+        puts country_code
 
         Country.create(:country_code => country_code, :name => country_name)
      
@@ -30,7 +29,7 @@ class ScraperController < ApplicationController
         end 
         end 
 
-        # puts "hi"
+        puts "hi"
         # country_codes = ['us']
         
         if j == 0 
@@ -45,8 +44,8 @@ class ScraperController < ApplicationController
         i=0
 
 
-        # puts "### Search for nodes by css"
-        # puts country 
+        puts "### Search for nodes by css"
+        puts country 
 
         song_artists_arr = []
         song_names_arr = []
@@ -70,7 +69,7 @@ class ScraperController < ApplicationController
            
        
 
-        # puts [song_artists_arr, song_names_arr]
+        puts [song_artists_arr, song_names_arr]
 
         i=1
 
@@ -81,8 +80,8 @@ class ScraperController < ApplicationController
             i+=1 
         end 
 
-        # puts artist_song_hash.length 
-        # puts "frcnifnifje" 
+        puts artist_song_hash.length 
+        puts "frcnifnifje" 
 
     
 
@@ -112,7 +111,7 @@ class ScraperController < ApplicationController
                     time_signature = audio_features.time_signature
                     valence = audio_features.valence
  
-                    # puts spotify_id
+                    puts spotify_id
                     Chart.create(:country_code => country, :position => j, :spotify_id => spotify_id)
                     Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
                 
@@ -126,25 +125,9 @@ class ScraperController < ApplicationController
         end 
        
         
-        # puts "Blahssdsd"
-        # puts j 
+        puts "Blahssdsd"
+        puts j 
         end 
-    end 
-    end 
-
-    def bugs
-
-        buggy_tracks = ["Wie ein Alpha", ]
-        # name = "Wie ein Alpha"
-        # puts name 
-        # tracks = RSpotify::Track.search(name, limit: 1)
-        # puts tracks.length
-
-        puts "{ednke}"
-    end 
-
-    def print_first
-        puts Song.first
     end 
 
 

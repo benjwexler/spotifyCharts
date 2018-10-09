@@ -1,3 +1,6 @@
 class Chart < ApplicationRecord
-    # has_many :songs 
-end
+    belongs_to :song
+    belongs_to :country
+  
+   
+end 
