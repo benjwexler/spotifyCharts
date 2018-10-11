@@ -9,51 +9,46 @@ class ScraperController < ApplicationController
    
 
     def index
+
+        puts "fuck u"
+
+        do_api_call = false
+
+        if  do_api_call == true
+
+       
+
         j=0
            
-          country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
-          if j==0
-        #    country_codes = ['us']
+            country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
+        
+        if j == 0 
         country_codes.each do |country_code|
+       
 
         doc = HTTParty.get("https://spotifycharts.com/regional/#{country_code}/weekly/latest")
         @parse_page = Nokogiri::HTML(doc)
 
         country_name  = @parse_page.css('.chart-filters-list .responsive-select .responsive-select-value')
 
-        country_name = country_name[0].content
-        # puts country_code
+            country_name = country_name[0].content
 
-        Country.create(:country_code => country_code, :name => country_name)
-     
-        
-        end 
-        end 
 
-        # puts "hi"
-        # country_codes = ['us']
-        
-        if j == 0 
-        country_codes.each do |country|
-       
-
-        doc = HTTParty.get("https://spotifycharts.com/regional/#{country}/weekly/latest")
-        @parse_page = Nokogiri::HTML(doc)
+            Country.create(:country_code => country_code, :name => country_name)
 
   
       
         i=0
 
 
-        # puts "### Search for nodes by css"
-        # puts country 
-
         song_artists_arr = []
         song_names_arr = []
 
        
             @parse_page.css('.chart-table-track strong').each do |song_name|
-                if i<=50
+
+                #this will yield 51 results but the first one isn't actual song
+                if i<=50 
                 song_names_arr.push(song_name.content)
                 i+=1 
                 end 
@@ -67,10 +62,6 @@ class ScraperController < ApplicationController
                 i+=1 
                 end 
             end
-           
-       
-
-        # puts [song_artists_arr, song_names_arr]
 
         i=1
 
@@ -81,19 +72,15 @@ class ScraperController < ApplicationController
             i+=1 
         end 
 
-        # puts artist_song_hash.length 
-        # puts "frcnifnifje" 
 
-    
 
-    # i =1
+    country_id = Country.last.id
 
     j = 1
 
     artist_song_hash.each_value {|value|
                 tracks = RSpotify::Track.search("#{value[0]} #{value[1]} ", limit: 1)
-                # puts i
-              
+                
                 if tracks.length >0
                     
                     name = tracks[0].name
@@ -112,39 +99,33 @@ class ScraperController < ApplicationController
                     time_signature = audio_features.time_signature
                     valence = audio_features.valence
  
-                    # puts spotify_id
-                    Chart.create(:country_code => country, :position => j, :spotify_id => spotify_id)
-                    Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
+                    # need to check here if the song exist. Validation is set
+                    if Song.where({spotify_id: spotify_id}).length == 0
+                        Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
+                    
+                    song_id = Song.last.id 
+                     else 
+                    song_id = Song.where({spotify_id: spotify_id})[0].id
+                    end 
+                    
+                    
+                    Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
                 
                 else 
-                    # puts "????? #{value[0]} #{value[1]} ???? "
-                    Chart.create(:country_code => country, :position => j, :spotify_id => "Unknown - #{value[0]} #{value[1]} ")
+                    Song.create(:name => value[0], :artist => value[1])
+                    song_id = Song.last.id
+                    Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
                 end 
                 j+=1 
                     
             }
         end 
        
-        
-        # puts "Blahssdsd"
-        # puts j 
+
         end 
     end 
     end 
+end 
 
-    def bugs
-
-        buggy_tracks = ["Wie ein Alpha", ]
-        # name = "Wie ein Alpha"
-        # puts name 
-        # tracks = RSpotify::Track.search(name, limit: 1)
-        # puts tracks.length
-
-        puts "{ednke}"
-    end 
-
-    def print_first
-        puts Song.first
-    end 
 
 
