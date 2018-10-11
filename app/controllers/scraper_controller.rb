@@ -9,36 +9,48 @@ class ScraperController < ApplicationController
    
 
     def index
+
+        country_id_counter = 1 
+
         j=0
            
-          country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
-          if j==0
-        #    country_codes = ['us']
-        country_codes.each do |country_code|
+            country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
+          if j==10
+                #    country_codes = ['us']
+            country_codes.each do |country_code|
 
-        doc = HTTParty.get("https://spotifycharts.com/regional/#{country_code}/weekly/latest")
-        @parse_page = Nokogiri::HTML(doc)
+            doc = HTTParty.get("https://spotifycharts.com/regional/#{country_code}/weekly/latest")
+            @parse_page = Nokogiri::HTML(doc)
 
-        country_name  = @parse_page.css('.chart-filters-list .responsive-select .responsive-select-value')
+            country_name  = @parse_page.css('.chart-filters-list .responsive-select .responsive-select-value')
 
-        country_name = country_name[0].content
-        # puts country_code
+            country_name = country_name[0].content
+            # puts country_code
 
-        Country.create(:country_code => country_code, :name => country_name)
+            Country.create(:country_code => country_code, :name => country_name)
+
+            country
      
         
-        end 
+            end 
         end 
 
         # puts "hi"
         # country_codes = ['us']
         
         if j == 0 
-        country_codes.each do |country|
+        country_codes.each do |country_code|
        
 
-        doc = HTTParty.get("https://spotifycharts.com/regional/#{country}/weekly/latest")
+        doc = HTTParty.get("https://spotifycharts.com/regional/#{country_code}/weekly/latest")
         @parse_page = Nokogiri::HTML(doc)
+
+        country_name  = @parse_page.css('.chart-filters-list .responsive-select .responsive-select-value')
+
+            country_name = country_name[0].content
+            # puts country_code
+
+            Country.create(:country_code => country_code, :name => country_name)
 
   
       
@@ -53,7 +65,9 @@ class ScraperController < ApplicationController
 
        
             @parse_page.css('.chart-table-track strong').each do |song_name|
-                if i<=50
+
+                #this will yield 51 results but the first one isn't actual song
+                if i<=50 
                 song_names_arr.push(song_name.content)
                 i+=1 
                 end 
@@ -112,9 +126,13 @@ class ScraperController < ApplicationController
                     time_signature = audio_features.time_signature
                     valence = audio_features.valence
  
-                    # puts spotify_id
-                    Chart.create(:country_code => country, :position => j, :spotify_id => spotify_id)
+                    # need to check here if the song exist. Validation is set
                     Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
+                    
+                    song_id = Song.last.id 
+                    country_id = Country.last.id
+                    
+                    Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
                 
                 else 
                     # puts "????? #{value[0]} #{value[1]} ???? "
