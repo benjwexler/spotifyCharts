@@ -102,12 +102,14 @@ class ScraperController < ApplicationController
 
     # i =1
 
+    country_id = Country.last.id
+
     j = 1
 
     artist_song_hash.each_value {|value|
                 tracks = RSpotify::Track.search("#{value[0]} #{value[1]} ", limit: 1)
                 # puts i
-              
+                
                 if tracks.length >0
                     
                     name = tracks[0].name
@@ -127,16 +129,22 @@ class ScraperController < ApplicationController
                     valence = audio_features.valence
  
                     # need to check here if the song exist. Validation is set
-                    Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
+                    if Song.where({spotify_id: spotify_id}).length == 0
+                        Song.create(:name => value[0], :artist => value[1], :spotify_id => spotify_id, :acousticness => acousticness, :danceability => danceability, :duration_ms => duration_ms, :energy => energy, :instrumentalness => instrumentalness, :key => key, :liveness => liveness, :mode => mode, :speechiness => speechiness, :tempo => tempo, :time_signature => time_signature, :valence => valence)
                     
                     song_id = Song.last.id 
-                    country_id = Country.last.id
+                     else 
+                    song_id = Song.where({spotify_id: spotify_id})[0].id
+                    end 
+                    
                     
                     Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
                 
                 else 
                     # puts "????? #{value[0]} #{value[1]} ???? "
-                    Chart.create(:country_code => country, :position => j, :spotify_id => "Unknown - #{value[0]} #{value[1]} ")
+                    Song.create(:name => value[0], :artist => value[1])
+                    song_id = Song.last.id
+                    Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
                 end 
                 j+=1 
                     
