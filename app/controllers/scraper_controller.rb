@@ -9,19 +9,17 @@ class ScraperController < ApplicationController
    
 
     def index
-
-        puts "fuck u"
-
+       
         do_api_call = false
 
         if  do_api_call == true
 
-       
-
         j=0
            
             country_codes = ['us', 'gb', 'ar', 'at', 'au', 'be', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
-        
+
+            # country_codes = ['hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mt', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'uy', 'vn']
+            # country_codes = ['us']
         if j == 0 
         country_codes.each do |country_code|
        
@@ -33,13 +31,9 @@ class ScraperController < ApplicationController
 
             country_name = country_name[0].content
 
-
             Country.create(:country_code => country_code, :name => country_name)
 
-  
-      
         i=0
-
 
         song_artists_arr = []
         song_names_arr = []
@@ -79,7 +73,16 @@ class ScraperController < ApplicationController
     j = 1
 
     artist_song_hash.each_value {|value|
-                tracks = RSpotify::Track.search("#{value[0]} #{value[1]} ", limit: 1)
+                RSpotify.raw_response = true
+
+                tracks = RSpotify::Track.search("#{value[0]} #{value[1]} ", limit: 1, market: country_code)
+
+                if tracks.code < 500
+                    RSpotify.raw_response = false 
+                    tracks = RSpotify::Track.search("#{value[0]} #{value[1]} ", limit: 1, market: country_code)
+                
+
+                puts "#{value[0]} #{value[1]} "
                 
                 if tracks.length >0
                     
@@ -109,16 +112,21 @@ class ScraperController < ApplicationController
                     end 
                     
                     
-                    Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
+                    
                 
                 else 
                     Song.create(:name => value[0], :artist => value[1])
                     song_id = Song.last.id
-                    Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
-                end 
-                j+=1 
                     
-            }
+                end 
+                Chart.create(:country_id => country_id, :position => j, :song_id => song_id)
+            else 
+                j+=1 
+                next 
+            end
+                j+=1 
+            }     
+            
         end 
        
 
